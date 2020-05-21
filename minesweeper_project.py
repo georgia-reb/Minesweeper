@@ -17,6 +17,7 @@ class Minesweeper:
 		self.__spots_cleared = 0
 		self.__game_won = False
 		self.__game_lost = False
+		self.__flags = []
 		
 		# This field contains what is presented to the player.
 		self.__guessing_field = []
@@ -112,6 +113,9 @@ class Minesweeper:
 		print(chr(27) + "[2J")
 		self.print_field()
 		
+		# Guess, place marker, or remove marker.
+		### ADD INVALID INPUT
+		guess_type = input("Would you like to take a guess (press return), place a flag (enter f), or remove a marker (enter r): ")
 		# Gets the users guess.
 		row = input("Input row value: ")
 		while row.isdigit() == False:
@@ -121,8 +125,14 @@ class Minesweeper:
 			column = input("Invalid input, please enter the y value again: ")
 		row = int(row)
 		column = int(column)
-		
-		self.calculate_guess(column, row)
+			
+		if guess_type == 'f':
+			self.__flags.append([column, row])
+		elif guess_type == 'r':
+			if [column, row] in self.__flags:
+				self.__flags.remove([column, row])
+		else:
+			self.calculate_guess(column, row)
 		
 		# Deals with if the the game is over (won or lost), and playing another round.
 		if self.__game_lost:
@@ -226,22 +236,26 @@ class Minesweeper:
 		print()
 		
 		m = 0
-		for i in self.__guessing_field:
+		for i in range(len(self.__guessing_field)):
 			print(colored(m, 'white'), end=' ')
 			m += 1
-			for j in i:
-				if j == 1:
-					print(colored(j, 'cyan'), end=' ')
-				elif j == 2:
-					print(colored(j, 'green'), end=' ')
-				elif j == 3:
-					print(colored(j, 'red'), end=' ')
-				elif j == 4:
-					print(colored(j, 'magenta'), end=' ')
-				elif j == '*' or j == 'H':
-					print(colored(j, 'grey'), end=' ')
+			for j in range(len(self.__guessing_field[i])):
+				# Checks to see if there is a flag placed in this spot.
+				if [i, j] in self.__flags:
+					print(colored('F', 'red'), end=' ')
+				# If not, it prints the value of that spot on the guessing_field, color coded.
+				elif self.__guessing_field[i][j] == 1:
+					print(colored(self.__guessing_field[i][j], 'cyan'), end=' ')
+				elif self.__guessing_field[i][j] == 2:
+					print(colored(self.__guessing_field[i][j], 'green'), end=' ')
+				elif self.__guessing_field[i][j] == 3:
+					print(colored(self.__guessing_field[i][j], 'magenta'), end=' ')
+				elif self.__guessing_field[i][j] == 4:
+					print(colored(self.__guessing_field[i][j], 'red'), end=' ')
+				elif self.__guessing_field[i][j] == '*' or self.__guessing_field[i][j] == 'H':
+					print(colored(self.__guessing_field[i][j], 'grey'), end=' ')
 				else:
-					print(j, end=' ')
+					print(self.__guessing_field[i][j], end=' ')
 			print()
 
 	def override_print_field(self, field):
@@ -263,9 +277,9 @@ class Minesweeper:
 				elif j == 2:
 					print(colored(j, 'green'), end=' ')
 				elif j == 3:
-					print(colored(j, 'red'), end=' ')
-				elif j == 4:
 					print(colored(j, 'magenta'), end=' ')
+				elif j == 4:
+					print(colored(j, 'red'), end=' ')
 				elif j == '*' or j == 'H':
 					print(colored(j, 'grey'), end=' ')
 				else:
